@@ -1,0 +1,14 @@
+{
+  "name": "web-quiz-game",
+  "version": "1.0.0",
+  "description": "Cyberpunk Interactive Web Quiz Game conforming to FZ-152",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5",
+    "xlsx": "^0.18.5"
+  }
+}
