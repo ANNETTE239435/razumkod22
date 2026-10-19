@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>КиберИскры — Панель Преподавателя</title>
+    <link rel="icon" href="favicon.ico">
+    <link rel="stylesheet" href="style.css">
+    <!-- Автономная библиотека для генерации QR-кодов прямо на экране компьютера -->
+    <script src="https://cloudflare.com" onerror="console.log('Ошибка загрузки библиотеки QR-кода')"></script>
+</head>
+<body class="cyberpunk-theme">
+
+    <!-- Автоматически скрываемый логотип -->
+    <div class="logo-container">
+        <img src="logo.png" class="logo-img" alt="Логотип" onerror="this.style.display='none'">
+    </div>
+
+    <div class="container grid-teacher">
+        <!-- ЛЕВАЯ ПАНЕЛЬ: УПРАВЛЕНИЕ, СТАТИСТИКА И ЗАГРУЗКА ВОПРОСОВ -->
+        <div class="quiz-card panel-left" style="max-height: 90vh; overflow-y: auto;">
+            <h2 class="neon-text">Панель Управления</h2>
+            
+            <!-- ЗОНА ОНЛАЙН-ЗАГРУЗКИ ВОПРОСОВ ПРЯМО НА САЙТЕ -->
+            <div class="upload-section" style="border: 1px dashed #7000ff; padding: 15px; margin-bottom: 20px; border-radius: 5px; background: rgba(13,14,21,0.6);">
+                <h4 style="color: #00f0ff; margin-top: 0; margin-bottom: 10px;">📚 Загрузка базы вопросов</h4>
+                
+                <!-- Способ 1: Импорт готового Excel -->
+                <div class="upload-group" style="margin-bottom: 15px;">
+                    <label style="font-size: 0.8rem; color: #aaa; display: block; margin-bottom: 5px;">Способ 1: Загрузить файл Excel (.xlsx)</label>
+                    <input type="file" id="excelFileInput" accept=".xlsx" style="font-size: 0.8rem; color: #fff;">
+                </div>
+
+                <!-- Способ 2: Вставка текста таблицы -->
+                <div class="upload-group">
+                    <label style="font-size: 0.8rem; color: #aaa; display: block; margin-bottom: 5px;">Способ 2: Вставить текст таблицы (скопированный из Excel)</label>
+                    <textarea id="excelTextInput" placeholder="Вставьте скопированные строки из Excel сюда...&#10;Формат: Вопрос [Вкладка] Ответ1 [Вкладка] Ответ2..." style="width: 100%; height: 60px; background: #0d0e15; border: 1px solid #7000ff; color: #fff; font-size: 0.8rem; padding: 5px; box-sizing: border-box; resize: none;"></textarea>
+                </div>
+                
+                <button id="btnApplyQuestions" class="btn-neon" style="width: 100%; padding: 5px; margin-top: 10px; font-size: 0.8rem;">Применить новые вопросы</button>
+                <div id="uploadStatus" style="font-size: 0.75rem; color: #ff0055; margin-top: 5px; text-align: center;"></div>
+            </div>
+
+            <div class="stat-box">
+                <span class="stat-label">Подключено хакеров:</span>
+                <span id="playerCount" class="stat-val neon-text-orange">0</span>
+            </div>
+
+            <!-- Список участников (видит только преподаватель на своем мониторе) -->
+            <div class="players-list-box">
+                <h3>Список участников в сети:</h3>
+                <ul id="playersList" class="clean-list"></ul>
+            </div>
+
+            <button id="nextQBtn" class="btn-neon btn-large">СЛЕДУЮЩИЙ ВОПРОС 🔥</button>
+        </div>
+
+        <!-- ПРАВАЯ ПАНЕЛЬ: ИГРОВОЙ ЭКРАН И ГРАФИКИ -->
+        <div class="quiz-card panel-right">
+            <!-- Начальный экран с QR-кодом для подключения -->
+            <div id="setup-screen">
+                <h3 class="neon-text">Сканируй код для входа:</h3>
+                <div id="qrcode" class="qr-container"></div>
+                <div id="studentUrl" class="url-text-hint"></div>
+            </div>
+
+            <!-- Активный экран вопроса и живой график популярности ответов -->
+            <div id="activeQuestionArea" class="hidden">
+                <h2 id="teacherQuestionText" class="neon-text">Ожидание запуска раунда...</h2>
+                
+                <div class="timer-wrapper">
+                    <span class="timer-label">ВРЕМЯ:</span>
+                    <span id="timerVal" class="timer-clock">00</span>
+                </div>
+
+                <div class="chart-container">
+                    <h3>Пульс ответов (в реальном времени):</h3>
+                    <div class="bar-wrapper"><span class="bar-label">А)</span> <div class="bar-container"><div id="bar1" class="bar-fill" style="width: 0%;"></div></div> <span id="val1" class="bar-count">0</span></div>
+                    <div class="bar-wrapper"><span class="bar-label">Б)</span> <div class="bar-container"><div id="bar2" class="bar-fill" style="width: 0%;"></div></div> <span id="val2" class="bar-count">0</span></div>
+                    <div class="bar-wrapper"><span class="bar-label">В)</span> <div class="bar-container"><div id="bar3" class="bar-fill" style="width: 0%;"></div></div> <span id="val3" class="bar-count">0</span></div>
+                </div>
+            </div>
+
+            <!-- Экран финала с Топ-3 пьедесталом -->
+            <div id="podiumArea" class="hidden">
+                <h2 class="neon-text">🏆 ФИНАЛЬНЫЙ ТОП-3 🏆</h2>
+                <div class="podium-grid">
+                    <div class="podium-place place-2"><div class="place-title">2 МЕСТО</div><div id="p2-name" class="p-name">-</div></div>
+                    <div class="podium-place place-1"><div class="place-title">1 МЕСТО</div><div id="p1-name" class="p-name">-</div></div>
+                    <div class="podium-place place-3"><div class="place-title">3 МЕСТО</div><div id="p3-name" class="p-name">-</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Защищенные аудиотеги эффектов викторины -->
+    <audio id="timerSound" src="timer.mp3" preload="auto" onerror="console.log('Файл timer.mp3 отсутствует')"></audio>
+    <audio id="fireSound" src="fire.mp3" preload="auto" onerror="console.log('Файл fire.mp3 отсутствует')"></audio>
+    <audio id="fanfareSound" src="fanfare.mp3" preload="auto" onerror="console.log('Файл fanfare.mp3 отсутствует')"></audio>
+    <!-- Скрипты обмена данными и логика сокетов -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        // ФУНКЦИЯ ОТОБРАЖЕНИЯ: разделяет анонимную строку на номер в журнале и никнейм
+        function formatStudentName(rawString) {
+            try {
+                if (rawString && rawString.includes('||')) {
+                    const parts = rawString.split('||');
+                    return `[№${parts[0]}] ${parts[1]}`; // Выведет красиво: [№5] CyberCat
+                }
+                return rawString;
+            } catch(e) {
+                return rawString;
+            }
+        }
+
+        // Автоматическая генерация интернет-ссылки для игры на хостинге
+        const studentLink = window.location.origin + '/student.html';
+        document.getElementById('studentUrl').innerText = studentLink;
+
+        window.onload = () => {
+            if (typeof QRCode !== 'undefined') {
+                new QRCode(document.getElementById("qrcode"), {
+                    text: studentLink,
+                    width: 180,
+                    height: 180,
+                    colorDark : "#00f0ff", // Сияющий неоновый голубой цвет кода
+                    colorLight : "#0d0e15" // Фон в цвет темы киберпанка
+                });
+            } else {
+                document.getElementById("qrcode").innerText = "[QR-код генерируется]";
+            }
+        };
+
+        // ЛОГИКА ОТПРАВКИ ВОПРОСОВ НА СЕРВЕР ПРЕПОДАВАТЕЛЕМ
+        const btnApply = document.getElementById('btnApplyQuestions');
+        const fileInput = document.getElementById('excelFileInput');
+        const textInput = document.getElementById('excelTextInput');
+        const statusDiv = document.getElementById('uploadStatus');
+
+        btnApply.onclick = () => {
+            statusDiv.style.color = '#00f0ff';
+            statusDiv.innerText = 'Обработка данных...';
+
+            // Если преподаватель вставила скопированный текст
+            if (textInput.value.trim() !== '') {
+                socket.emit('upload_questions_text', { text: textInput.value.trim() });
+                textInput.value = '';
+                return;
+            }
+
+            // Если преподаватель прикрепила файл Excel
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const arrayBuffer = e.target.result;
+                    socket.emit('upload_questions_file', { buffer: arrayBuffer, name: file.name });
+                };
+                reader.readAsArrayBuffer(file);
+                fileInput.value = '';
+                return;
+            }
+
+            statusDiv.style.color = '#ff0055';
+            statusDiv.innerText = 'Ошибка: выберите файл или вставьте текст!';
+        };
+
+        // Сервер сообщает об успешном обновлении базы вопросов викторины
+        socket.on('questions_updated', (data) => {
+            statusDiv.style.color = '#00ff70';
+            statusDiv.innerText = `Успешно загружено вопросов: ${data.count}!`;
+            setTimeout(() => { statusDiv.innerText = ''; }, 4000);
+        });
+
+        // Логика кнопки перехода к следующему вопросу
+        const nextQBtn = document.getElementById('nextQBtn');
+        nextQBtn.onclick = () => {
+            socket.emit('next_question');
+            document.getElementById('setup-screen').classList.add('hidden');
+            document.getElementById('podiumArea').classList.add('hidden');
+            document.getElementById('activeQuestionArea').classList.remove('hidden');
+        };
+
+        // Обновление живого списка участников в панели преподавателя
+        socket.on('update_players_count', (data) => {
+            document.getElementById('playerCount').innerText = data.count;
+            const listElement = document.getElementById('playersList');
+            let html = '';
+            
+            if (data.players && Array.isArray(data.players)) {
+                data.players.forEach(p => {
+                    html += `<li>🟢 ${formatStudentName(p.name)} <span class="score-tag">[${p.score} б.]</span></li>`;
+                });
+            }
+            listElement.innerHTML = html;
+        });
+
+        // Запуск нового раунда и включение музыки/эффектов
+        socket.on('new_question', (data) => {
+            const qText = document.getElementById('teacherQuestionText');
+            qText.innerText = data.question;
+            document.getElementById('timerVal').innerText = data.time;
+
+            if (data.isFire) {
+                qText.classList.add('fire-theme');
+                if (document.getElementById('fireSound')) document.getElementById('fireSound').play().catch(() => {});
+            } else {
+                qText.classList.remove('fire-theme');
+            }
+
+            if (document.getElementById('timerSound')) document.getElementById('timerSound').play().catch(() => {});
+            resetBars();
+        });
+
+        // Обновление живого графика ответов на экране ведущего
+        socket.on('update_chart', (data) => {
+            document.getElementById('val1').innerText = data.a;
+            document.getElementById('val2').innerText = data.b;
+            document.getElementById('val3').innerText = data.c;
+            document.getElementById('bar1').style.width = data.aPerc + '%';
+            document.getElementById('bar2').style.width = data.bPerc + '%';
+            document.getElementById('bar3').style.width = data.cPerc + '%';
+        });
+
+        // Обновление игровых часов
+        socket.on('timer_tick', (time) => {
+            document.getElementById('timerVal').innerText = time;
+            if (time === 0 && document.getElementById('timerSound')) document.getElementById('timerSound').pause();
+        });
+
+        function resetBars() {
+            document.querySelectorAll('.bar-fill').forEach(bar => bar.style.width = '0%');
+            document.querySelectorAll('.bar-count').forEach(val => val.innerText = '0');
+        }
+
+        // Конец игры: вывод Топ-3 победителей на пьедестал
+        socket.on('game_over', (data) => {
+            document.getElementById('activeQuestionArea').classList.add('hidden');
+            document.getElementById('podiumArea').classList.remove('hidden');
+
+            document.getElementById('p1-name').innerText = data.p1 ? formatStudentName(data.p1.name) : '-';
+            document.getElementById('p2-name').innerText = data.p2 ? formatStudentName(data.p2.name) : '-';
+            document.getElementById('p3-name').innerText = data.p3 ? formatStudentName(data.p3.name) : '-';
+
+            if (document.getElementById('fanfareSound')) document.getElementById('fanfareSound').play().catch(() => {});
+        });
+    </script>
+</body>
+</html>

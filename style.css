@@ -1,0 +1,291 @@
+/* Глобальные киберпанк стили */
+body {
+    background-color: #0d0e15;
+    color: #e2e8f0;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.container-fluid {
+    padding: 20px;
+}
+
+.text-center { text-align: center; }
+.hidden { display: none !important; }
+
+.logo-img {
+    max-height: 80px;
+    margin: 10px auto 20px auto;
+    display: block;
+    border-radius: 8px;
+}
+
+h1, h2, h3 {
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.neon-text {
+    color: #00f0ff;
+    text-shadow: 0 0 10px rgba(0,240,255,0.6), 0 0 20px rgba(0,240,255,0.3);
+}
+
+.neon-text-purple {
+    color: #7000ff;
+    text-shadow: 0 0 10px rgba(112,0,255,0.6), 0 0 20px rgba(112,0,255,0.3);
+}
+
+.neon-text-red {
+    color: #ff0055;
+    text-shadow: 0 0 10px rgba(255,0,85,0.6);
+}
+
+.subtitle {
+    color: #94a3b8;
+    margin-bottom: 30px;
+}
+
+/* Кнопки */
+.btn {
+    display: block;
+    width: 100%;
+    padding: 14px 20px;
+    margin: 15px 0;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+
+.btn-cyan {
+    background: transparent;
+    color: #00f0ff;
+    border: 2px solid #00f0ff;
+    box-shadow: 0 0 10px rgba(0,240,255,0.2);
+}
+
+.btn-cyan:hover:not(:disabled) {
+    background: #00f0ff;
+    color: #0d0e15;
+    box-shadow: 0 0 20px rgba(0,240,255,0.6);
+}
+
+.btn-purple {
+    background: transparent;
+    color: #7000ff;
+    border: 2px solid #7000ff;
+    box-shadow: 0 0 10px rgba(112,0,255,0.2);
+}
+
+.btn-purple:hover:not(:disabled) {
+    background: #7000ff;
+    color: #ffffff;
+    box-shadow: 0 0 20px rgba(112,0,255,0.6);
+}
+
+.btn-large {
+    font-size: 20px;
+    padding: 20px;
+}
+
+.btn:disabled {
+    border-color: #475569;
+    color: #475569;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* Карточки */
+.card {
+    background: #151722;
+    border: 1px solid #272a3d;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    margin-bottom: 20px;
+}
+
+/* Огненная пульсирующая тема под IsFire */
+.fire-theme {
+    border: 2px solid #ff5500 !important;
+    animation: firePulse 1.5s infinite alternate;
+}
+
+@keyframes firePulse {
+    0% { box-shadow: 0 0 10px rgba(255,85,0,0.3); }
+    100% { box-shadow: 0 0 25px rgba(255,85,0,0.8); }
+}
+
+.fire-badge {
+    background: #ff5500;
+    color: #fff;
+    padding: 4px 10px;
+    font-weight: bold;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+/* Сетки */
+.role-selection { margin-top: 50px; }
+
+.input-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #94a3b8;
+}
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    background: #0d0e15;
+    border: 1px solid #475569;
+    color: #fff;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+.input-group input:focus {
+    border-color: #00f0ff;
+    outline: none;
+}
+
+/* Чекбоксы ФЗ-152 */
+.law-checkboxes {
+    text-align: left;
+    margin: 25px 0;
+}
+.checkbox-container {
+    display: block;
+    position: relative;
+    padding-left: 30px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #cbd5e1;
+}
+.checkbox-container input { display: none; }
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 18px;
+    width: 18px;
+    background-color: #0d0e15;
+    border: 1px solid #475569;
+    border-radius: 4px;
+}
+.checkbox-container:hover input ~ .checkmark { border-color: #00f0ff; }
+.checkbox-container input:checked ~ .checkmark {
+    background-color: #00f0ff;
+    border-color: #00f0ff;
+}
+
+/* Модалки */
+.modal {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+.modal-content {
+    background: #151722;
+    border: 2px solid #7000ff;
+    padding: 30px;
+    border-radius: 12px;
+    max-width: 500px;
+    width: 90%;
+}
+
+/* Панель ведущего */
+.header-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #272a3d;
+    padding-bottom: 15px;
+    margin-bottom: 30px;
+}
+.main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+@media (max-width: 768px) {
+    .main-grid { grid-template-columns: 1fr; }
+}
+
+.qrcode-wrapper { margin-top: 30px; }
+.qrcode-box {
+    display: inline-block;
+    padding: 10px;
+    background: white;
+    border-radius: 8px;
+}
+
+/* Графики */
+.chart-container { margin: 20px 0; }
+.chart-bar-wrapper {
+    display: flex;
+    align-items: center;
+    margin: 12px 0;
+}
+.chart-bar-wrapper span { width: 30px; font-weight: bold; }
+.bar {
+    background: linear-gradient(90deg, #00f0ff, #7000ff);
+    height: 25px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    color: #fff;
+    font-weight: bold;
+    transition: width 0.4s ease;
+}
+
+.leaderboard-list {
+    text-align: left;
+    font-size: 18px;
+}
+.leaderboard-list li { margin: 10px 0; }
+
+/* Пьедестал */
+.pedestal-flex {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    margin-top: 50px;
+    height: 200px;
+}
+.place {
+    width: 100px;
+    margin: 0 10px;
+    padding: 15px 5px;
+    border-radius: 8px 8px 0 0;
+    font-weight: bold;
+}
+.first-place { background: #ffd700; color: #000; height: 160px; }
+.second-place { background: #c0c0c0; color: #000; height: 120px; }
+.third-place { background: #cd7f32; color: #000; height: 90px; }
+.medal { font-size: 24px; margin-bottom: 10px; }

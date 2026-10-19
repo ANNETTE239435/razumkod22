@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>КиберИскры — Вход</title>
+    <link rel="icon" href="favicon.ico">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="cyberpunk-theme">
+    
+    <!-- Логотип (автоскрытие, если файла нет) -->
+    <div class="logo-container">
+        <img src="logo.png" class="logo-img" alt="Логотип" onerror="this.style.display='none'">
+    </div>
+
+    <div class="container">
+        <!-- ЭКРАН РЕГИСТРАЦИИ В ИГРЕ -->
+        <div id="auth-screen" class="quiz-card">
+            <h2 class="neon-text">Регистрация в игре</h2>
+            
+            <div class="input-group" style="margin-bottom: 15px;">
+                <label for="student-journal-num">Ваш номер в журнале:</label>
+                <input type="number" id="student-journal-num" placeholder="Например: 5" min="1" max="50" autocomplete="off">
+            </div>
+
+            <div class="input-group">
+                <label for="student-nickname">Ваш игровой никнейм:</label>
+                <input type="text" id="student-nickname" placeholder="Например: CyberCat..." autocomplete="off">
+            </div>
+
+            <button id="btn-join" class="btn-neon" disabled>ВОЙТИ В ИГРУ</button>
+        </div>
+
+        <!-- ИГРОВОЙ ЭКРАН -->
+        <div id="game-screen" class="quiz-card hidden">
+            <div id="wait-message" class="neon-text-orange">Вы в игре! Ожидайте запуска раунда ведущим...</div>
+            <div id="question-box" class="hidden">
+                <h3 id="question-text">Текст вопроса</h3>
+                <div class="options-grid">
+                    <button class="btn-option" data-idx="1">А) <span id="opt1"></span></button>
+                    <button class="btn-option" data-idx="2">Б) <span id="opt2"></span></button>
+                    <button class="btn-option" data-idx="3">В) <span id="opt3"></span></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ВАРИАНТ 1: ВСПЛЫВАЮЩЕЕ ОКНО ПРИ ВХОДЕ (СИСТЕМА БЕЗОПАСНОСТИ) -->
+    <div id="security-notice-modal" class="modal">
+        <div class="modal-content text-center">
+            <h3 class="neon-text">Протокол конфиденциальности</h3>
+            <div class="modal-body-text" style="margin: 20px 0; font-size: 0.95rem; line-height: 1.6; color: #e0e0e0;">
+                <p>Для участия в турнирной таблице введите только номер в журнале и игровой ник.</p>
+                <p>Система не запрашивает имена, фамилии и контакты.</p>
+                <p>Все данные автоматически удаляются сразу после окончания занятия.</p>
+            </div>
+            <button id="btn-close-notice" class="btn-neon" style="padding: 8px 25px; font-size: 0.9rem;">Продолжить</button>
+        </div>
+    </div>
+
+    <!-- ВАРИАНТ 2: СТРОЧКА В ФУТЕРЕ (ВНИЗУ СТРАНИЦЫ) -->
+    <footer style="position: fixed; bottom: 10px; width: 100%; text-align: center; font-size: 0.75rem; color: #666; padding: 0 10px; box-sizing: border-box;">
+        Обработка данных: только обезличенные идентификаторы (номер в журнале + ник). Данные не сохраняются после сессии.
+    </footer>
+
+    <!-- Защищенные аудиотеги эффектов -->
+    <audio id="correctSound" src="correct.mp3" preload="auto" onerror="console.log('Звуки отсутствуют')"></audio>
+    <audio id="wrongSound" src="wrong.mp3" preload="auto" onerror="console.log('Звуки отсутствуют')"></audio>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const journalInput = document.getElementById('student-journal-num');
+        const nickInput = document.getElementById('student-nickname');
+        const btnJoin = document.getElementById('btn-join');
+        const noticeModal = document.getElementById('security-notice-modal');
+        const closeNoticeBtn = document.getElementById('btn-close-notice');
+
+        // Логика всплывающего окна: закрывается по кнопке «Продолжить»
+        closeNoticeBtn.onclick = () => {
+            noticeModal.classList.add('hidden');
+            // Переводим фокус на первое поле для удобства
+            journalInput.focus();
+        };
+
+        // Кнопка входа активируется, только если заполнены ОБА поля
+        function validateInputs() {
+            btnJoin.disabled = (journalInput.value.trim() === '' || nickInput.value.trim() === '');
+        }
+
+        journalInput.addEventListener('input', validateInputs);
+        nickInput.addEventListener('input', validateInputs);
+
+        // Отправка склеенной безопасной строки на сервер
+        btnJoin.onclick = () => {
+            const journalNum = journalInput.value.trim();
+            const nickname = nickInput.value.trim();
+            const fullDataString = journalNum + "||" + nickname;
+            
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            
+            socket.emit('join_student', { name: fullDataString });
+        };
+
+        // Прием игровых вопросов
+        socket.on('next_question', (data) => {
+            document.getElementById('wait-message').classList.add('hidden');
+            const qBox = document.getElementById('question-box');
+            qBox.classList.remove('hidden');
+            
+            if (data.isFire) { qBox.classList.add('fire-theme'); } else { qBox.classList.remove('fire-theme'); }
+            
+            document.getElementById('question-text').innerText = data.question;
+            document.getElementById('opt1').innerText = data.options || '';
+            document.getElementById('opt2').innerText = data.options || '';
+            document.getElementById('opt3').innerText = data.options || '';
+            
+            document.querySelectorAll('.btn-option').forEach(btn => btn.disabled = false);
+        });
+
+        // Отправка ответов
+        document.querySelectorAll('.btn-option').forEach(btn => {
+            btn.onclick = function() {
+                const answerIdx = this.getAttribute('data-idx');
+                socket.emit('submit_answer', { answer: answerIdx });
+                document.querySelectorAll('.btn-option').forEach(b => b.disabled = true);
+            };
+        });
+
+        // Звуки результатов
+        socket.on('answer_result', (data) => {
+            const sound = data.isCorrect ? document.getElementById('correctSound') : document.getElementById('wrongSound');
+            if (sound) sound.play().catch(() => {});
+        });
+    </script>
+</body>
+</html>
